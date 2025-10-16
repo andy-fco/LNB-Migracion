@@ -8,6 +8,7 @@
 
 body {
   background-color: #2d2d2d;
+  color: aliceblue;
 }
 
 /*nav*/
@@ -21,25 +22,41 @@ nav a {
 
 .nav-link {
   white-space: nowrap;
+  height: 100%;
+}
+
+.nav-item {
+  height: 100%;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  text-align: center;
+}
+
+.nav-link:hover {
+  background-color: #c70000;
 }
 
 /*login*/
-#login {
-  background-color: #e70000 !important;
-  color: rgb(255, 254, 255);
-  padding: 10px;
-
-  border-radius: 5px;
-  text-align: center;
-  width: 100px;
-  margin: auto;
+#login,
+#registro {
+  background-color: #e92d2d !important;
+  border-radius: 20px;
 }
 
-/* Contenedor central */
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 2rem;
+/* INDEX */
+#index-news {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.transparent {
+  background: none;
+  border: none;
+  color: aliceblue;
 }
 
 /* Títulos */
@@ -50,37 +67,4 @@ h3 {
   margin-top: 1rem;
   color: #ebebeb;
   text-shadow: 0 0 8px rgba(150, 120, 255, 0.6);
-}
-
-/* Inputs */
-input,
-select {
-  padding: 0.8rem;
-  margin: 0.5rem 0 1rem;
-  border: none;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  outline: none;
-  transition: 0.3s;
-  width: 50%;
-}
-
-input:focus,
-select:focus {
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 10px #7b61ff;
-}
-
-/* Links */
-a {
-  color: #80d0ff;
-  text-decoration: none;
-  transition: 0.3s;
-  width: 100px;
-  margin: 10px;
-}
-
-a:hover {
-  color: #b19cd9;
 }

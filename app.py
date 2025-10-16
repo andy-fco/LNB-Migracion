@@ -13,10 +13,12 @@ app.config["SECRET_KEY"] = "clave_secreta_123"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+gnews_api_key = "b6e169c2ada7c7fba93403ff919b77f9"
+
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
-login_manager.login_view = "login"  # Redirige al login si intenta entrar sin auth
+login_manager.login_view = "login"  
 
 
 class User(UserMixin, db.Model):
@@ -31,7 +33,17 @@ def load_user(user_id):
 
 @app.route("/")
 def index():
-    return render_template('index.html')
+    try:
+        url = f"https://gnews.io/api/v4/search?q=basquet&lang=es&country=ar&max=6&apikey={gnews_api_key}"
+        r = requests.get(url, timeout=6)
+        r.raise_for_status()
+        data = r.json()
+        articles = data.get("articles", [])
+    except Exception as e:
+        articles = []
+        error = f"Error obteniendo noticias: {e}"
+        return render_template("index.html", articles=articles, error=error)
+    return render_template("index.html", articles=articles, error=None)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -63,6 +75,10 @@ def login():
 
     return render_template('login.html')
 
+@app.route("/equipos")
+def equipos():
+    return render_template("equipos.html")
+
 @app.route("/noticias")
 def noticias():
     return render_template("noticias.html")
@@ -88,15 +104,6 @@ def perfil():
     return render_template("perfil.html", username = current_user.username , mail = current_user.mail)
 
 
-@app.route("/admin")
-@login_required
-def admin():
-    return render_template('admin.html' , usuario = current_user.username , usuarios = User.query.all())
-@app.route("/protected")
-@login_required
-def protected():
-   
-    return render_template("protected.html" , usuaario= current_user.username)
 
 @app.route("/logout")
 @login_required
@@ -104,36 +111,6 @@ def logout():
     logout_user()
     return redirect(url_for("index"))
 
-
-@app.route("/clima", methods=["GET", "POST"])
-@login_required
-def clima():
-    weather_data = None
-    if request.method == "POST":
-        ciudad = request.form["ciudad"]
-        api_key = "f56823a092569c386960376448523823"
-        url = f"http://api.openweathermap.org/data/2.5/weather?q={ciudad}&appid={api_key}&units=metric&lang=es"
-        response = requests.get(url)
-        if response.status_code == 200:
-            weather_data = response.json()
-        else:
-            weather_data = {"error": "No se pudo obtener el clima"}
-
-    return render_template("clima.html", weather=weather_data)
-@app.route("/Usuarios", methods=["GET","POST"])
-@login_required
-def usuarios():
-    Users_data = None
-    if request.method =="POST":
-        id_user = request.form["id"]
-        url = f"https://api.escuelajs.co/api/v1/users/{int(id_user)}"
-        response = requests.get(url)
-        if response.status_code == 200:
-            Users_data = response.json()
-        else:
-            Users_data = {"error": "No se pudo obtener el usuario"}
-
-    return render_template("usuarios.html", Users=Users_data)
 
 with app.app_context():
     db.create_all()
