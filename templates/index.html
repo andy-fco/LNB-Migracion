@@ -1,144 +1,55 @@
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Liga Nacional de Basquet</title>
+{% extends "base.html" %} {% block title %}Inicio{% endblock %} {% block content
+%}
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
-    />
-  </head>
-  <body>
-    <nav id="nav" class="navbar navbar-expand-lg p-0">
-      
-        <a class="navbar-brand p-1 m-1" href="{{url_for('index')}}"
-          ><img
-            src="{{url_for('static', filename='img/Logo_LNB.png')}}"
-            alt="Logo_LNB"
-            height="50"
-            width="50"
-        /></a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNavAltMarkup"
-          aria-controls="navbarNavAltMarkup"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
+<h1 class="text-3xl font-bold mb-6">
+  Bienvenido al sitio de la Liga Nacional de Básquet
+</h1>
+
+<div id="index-news" class="mb-10">
+  <h2 class="text-2xl font-semibold mb-4">Últimas novedades</h2>
+
+  {% if error %}
+  <div class="bg-yellow-200 text-yellow-800 px-4 py-2 mb-4 rounded">
+    {{ error }}
+  </div>
+  {% endif %} {% if articles %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for a in articles %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
+      {% if a.image %}
+      <img
+        src="{{ a.image }}"
+        alt="imagen noticia"
+        class="w-full h-48 object-cover"
+      />
+      {% endif %}
+
+      <div class="p-4 flex flex-col flex-grow">
+        <h5 class="text-lg font-bold mb-2">{{ a.title }}</h5>
+        <p class="text-sm text-gray-600 flex-grow">{{ a.description or '' }}</p>
+
+        {% if a.source %}
+        <p class="text-xs text-gray-500 mt-3">{{ a.source['name'] }}</p>
+        {% endif %}
+      </div>
+
+      {% if a.url %}
+      <div class="p-4 border-t">
+        <a
+          href="{{ a.url }}"
+          target="_blank"
+          class="inline-block bg-acento text-black font-semibold px-3 py-1 rounded hover:opacity-90"
         >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <ul class="navbar-nav ms-auto align-items-center">
-            <li class="nav-item h-100">
-              <a class="nav-link" href="{{ url_for('equipos') }}">Equipos</a>
-            </li>
-            <li class="nav-item dropdown h-100">
-              <button
-                class="nav-link dropdown-toggle transparent "
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Novedades
-              </button>
-              <ul class="dropdown-menu dropdown-menu-dark">
-                <li>
-                  <a class="dropdown-item" href="{{ url_for('noticias') }}"
-                    >Noticias</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="{{ url_for('eventos') }}"
-                    >Eventos</a
-                  >
-                </li>
-              </ul>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('juegos') }}">Juegos</a>
-            </li>
-
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('mi_jugador') }}"
-                >Mi jugador</a
-              >
-            </li>
-
-            {% if current_user.is_authenticated %}
-
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('perfil') }}">Perfil</a>
-            </li>
-            {% else %}
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('login') }}"
-                >Iniciar sesión</a
-              >
-            </li>
-
-            {% endif %}
-          </ul>
-        </div>
+          Leer completo
+        </a>
       </div>
-    </nav>
-
-    <h1>Bienvenido al sitio de la Liga Nacional de Básquet</h1>
-
-    <div id="index-news" class="mx-5">
-      <h2>Últimas novedades</h2>
-      {% if error %}
-      <div class="alert alert-warning">{{ error }}</div>
-      {% endif %} {% if articles %}
-      <div class="row g-3">
-        {% for a in articles %}
-        <div class="col-md-6 col-lg-4">
-          <div class="card h-100">
-            {% if a.image %}
-            <img
-              src="{{ a.image }}"
-              class="card-img-top"
-              alt="imagen noticia"
-            />
-            {% endif %}
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">{{ a.title }}</h5>
-              <p class="card-text mb-2">{{ a.description or '' }}</p>
-              <p class="mt-auto mb-0">
-                <small class="text-muted">{{ a.source['name'] }}</small>
-              </p>
-            </div>
-            {% if a.url %}
-            <div class="card-footer">
-              <a
-                href="{{ a.url }}"
-                target="_blank"
-                class="btn btn-sm btn-primary"
-                >Leer completo</a
-              >
-            </div>
-            {% endif %}
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-      {% else %}
-      <p>No hay noticias disponibles.</p>
       {% endif %}
     </div>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-      crossorigin="anonymous"
-    ></script>
-  </body>
-</html>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="text-gray-600">No hay noticias disponibles.</p>
+  {% endif %}
+</div>
+
+{% endblock %}
