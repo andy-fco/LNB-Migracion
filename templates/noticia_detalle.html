@@ -1,0 +1,40 @@
+{% extends "base.html" %} {% block title %}{{ articulo.titulo }}{% endblock %}
+{% block content %}
+
+<!-- Portada -->
+<img
+  src="{{ url_for('static', filename=articulo.portada or 'img/placeholder_articulo.jpg') }}"
+  class="w-full h-80 object-cover rounded-xl shadow mb-8"
+/>
+
+<h1 class="text-4xl font-bold mb-4">{{ articulo.titulo }}</h1>
+
+<p class="text-gray-400 mb-6">
+  {{ articulo.fecha.strftime('%d/%m/%Y') if articulo.fecha else '' }}
+</p>
+
+<p class="text-lg leading-relaxed whitespace-pre-line mb-10">
+  {{ articulo.descripcion }}
+</p>
+
+<!-- Fotos extra -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  {% if articulo.foto_1 %}
+  <img
+    src="{{ url_for('static', filename=articulo.foto_1) }}"
+    class="rounded-xl shadow-lg object-cover h-64 w-full"
+  />
+  {% endif %} {% if articulo.foto_2 %}
+  <img
+    src="{{ url_for('static', filename=articulo.foto_2) }}"
+    class="rounded-xl shadow-lg object-cover h-64 w-full"
+  />
+  {% endif %} {% if articulo.foto_3 %}
+  <img
+    src="{{ url_for('static', filename=articulo.foto_3) }}"
+    class="rounded-xl shadow-lg object-cover h-64 w-full"
+  />
+  {% endif %}
+</div>
+
+{% endblock %}

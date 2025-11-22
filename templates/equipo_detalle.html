@@ -1,0 +1,159 @@
+{% extends "base.html" %} {% block title %}{{ equipo.nombre }}{% endblock %} {%
+block content %}
+
+<!-- =============================== -->
+<!-- PORTADA + TARJETA FLOTANTE -->
+<!-- =============================== -->
+
+<div class="relative w-full">
+  <!-- FOTO DEL ESTADIO (más alta) -->
+  <img
+    src="{{ url_for('static', filename=equipo.foto_estadio or 'img/placeholder_estadio.jpg') }}"
+    class="w-full h-96 object-cover rounded-xl shadow-lg"
+  />
+
+  <!-- TARJETA FLOTANTE -->
+  <div
+    class="absolute left-10 bottom-[-70px] bg-secundario/90 backdrop-blur-md p-6 rounded-xl shadow-xl border border-gray-700 flex items-center gap-6 w-[600px]"
+  >
+    <!-- ESCUDO -->
+    <img
+      src="{{ url_for('static', filename=equipo.escudo or 'img/placeholder_equipo.png') }}"
+      class="w-28 h-28 object-contain rounded-lg shadow"
+    />
+
+    <!-- INFO -->
+    <div class="space-y-1">
+      <h1 class="text-4xl font-bold">{{ equipo.nombre }}</h1>
+      <p class="text-gray-300 text-lg">{{ equipo.ciudad }}</p>
+
+      <p class="text-gray-300">
+        <span class="font-semibold">Estadio:</span> {{ equipo.estadio }}
+      </p>
+
+      <p class="text-gray-300">
+        <span class="font-semibold">Fundado:</span>
+        {{ equipo.fecha_fundacion.strftime('%d/%m/%Y') if equipo.fecha_fundacion
+        else '—' }}
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="h-28"></div>
+
+<!-- =============================== -->
+<!-- SECCIÓN: PLANTEL -->
+<!-- =============================== -->
+
+<h2 class="text-3xl font-bold mt-12 mb-4">Plantel</h2>
+
+<div class="relative">
+  <!-- Flecha izquierda -->
+  <button
+    onclick="scrollCarrusel(-1)"
+    class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-secundario p-3 rounded-full border border-gray-700 hover:bg-gray-800"
+  >
+    ←
+  </button>
+
+  <!-- Carrusel -->
+  <div id="carrusel" class="flex overflow-x-auto gap-6 py-4 scroll-smooth">
+    {% for jugador in equipo.jugadores %}
+    <a
+      href="{{ url_for('jugador_detalle', id=jugador.id) }}"
+      class="min-w-[220px] bg-secundario border border-gray-700 rounded-xl p-4 flex flex-col items-center hover:bg-gray-800 hover:scale-[1.03] transition shadow"
+    >
+      <img
+        src="{{ url_for('static', filename=jugador.foto_carnet or 'img/placeholder_jugador.png') }}"
+        class="w-28 h-28 object-cover rounded-full mb-3"
+      />
+
+      <h3 class="text-lg font-semibold">
+        {{ jugador.nombre }} {{ jugador.apellido }}
+      </h3>
+      <p class="text-gray-400">{{ jugador.posicion }}</p>
+      <p class="text-red-400 font-bold mt-1">Media: {{ jugador.media }}</p>
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- Flecha derecha -->
+  <button
+    onclick="scrollCarrusel(1)"
+    class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-secundario p-3 rounded-full border border-gray-700 hover:bg-gray-800"
+  >
+    →
+  </button>
+</div>
+
+<script>
+  function scrollCarrusel(direction) {
+    const c = document.getElementById("carrusel");
+    c.scrollBy({ left: direction * 300, behavior: "smooth" });
+  }
+</script>
+
+<!-- =============================== -->
+<!-- SECCIÓN: DIRECTOR TÉCNICO -->
+<!-- =============================== -->
+
+<h2 class="text-3xl font-bold mt-16 mb-4">DT</h2>
+
+{% if equipo.dts and equipo.dts|length > 0 %} {% set dt = equipo.dts[0] %}
+<div
+  class="flex gap-8 bg-secundario p-6 rounded-xl border border-gray-700 shadow-lg"
+>
+  <!-- Foto DT -->
+  <img
+    src="{{ url_for('static', filename=dt.foto or 'img/placeholder_jugador.png') }}"
+    class="w-40 h-52 object-cover rounded-xl shadow"
+  />
+
+  <!-- Info DT -->
+  <div class="space-y-2">
+    <h3 class="text-2xl font-bold">{{ dt.nombre }} {{ dt.apellido }}</h3>
+    <p>
+      <span class="font-semibold">Nacimiento:</span> {{ dt.fecha_nacimiento }}
+    </p>
+    <p>
+      <span class="font-semibold">Nacionalidad:</span> {{ dt.nacionalidad }}
+    </p>
+    <p><span class="font-semibold">Ciudad:</span> {{ dt.ciudad }}</p>
+    <p>
+      <span class="font-semibold">Temporadas en la liga:</span> {{ dt.temporadas
+      }}
+    </p>
+  </div>
+</div>
+{% else %}
+<p class="text-gray-400">No hay registro de DT para este equipo.</p>
+{% endif %}
+
+<!-- =============================== -->
+<!-- SECCIÓN: HISTORIA -->
+<!-- =============================== -->
+
+<h2 class="text-3xl font-bold mt-16 mb-6">Historia</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+  <!-- Temporadas -->
+  <div class="bg-secundario p-6 rounded-xl border border-gray-700">
+    <h3 class="text-xl font-semibold mb-2">Temporadas</h3>
+    <p class="text-5xl font-bold">{{ equipo.temporadas }}</p>
+  </div>
+
+  <!-- Temporada regular -->
+  <div class="bg-secundario p-6 rounded-xl border border-gray-700">
+    <h3 class="text-xl font-semibold mb-2">Temporada Regular</h3>
+    <p class="text-4xl font-bold">XX%</p>
+  </div>
+
+  <!-- Campeonatos -->
+  <div class="bg-secundario p-6 rounded-xl border border-gray-700">
+    <h3 class="text-xl font-semibold mb-2">Campeonatos</h3>
+    <p class="text-5xl font-bold">{{ equipo.campeonatos }}</p>
+  </div>
+</div>
+
+{% endblock %}

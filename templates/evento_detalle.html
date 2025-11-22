@@ -1,0 +1,45 @@
+{% extends "base.html" %} {% block title %}{{ evento.titulo }}{% endblock %} {%
+block content %}
+
+<!-- Portada -->
+<img
+  src="{{ url_for('static', filename=evento.portada or 'img/placeholder_evento.jpg') }}"
+  class="w-full h-80 object-cover rounded-xl shadow mb-8"
+/>
+
+<h1 class="text-4xl font-bold mb-4">{{ evento.titulo }}</h1>
+
+<p class="text-gray-400 mb-6 text-lg">
+  {{ evento.fecha_y_hora.strftime('%d/%m/%Y %H:%M') if evento.fecha_y_hora else
+  '' }}
+</p>
+
+<p class="text-lg leading-relaxed whitespace-pre-line mb-10">
+  {{ evento.descripcion }}
+</p>
+
+<p class="text-gray-300 mb-6">Cupos: {{ inscriptos }} / {{ evento.cap_max }}</p>
+
+<!-- Botón inscribirse -->
+{% if current_user.is_authenticated %} {% if ya_inscripto %}
+<p class="text-green-400 font-semibold mb-6">Ya estás inscripto ✔</p>
+
+{% elif inscriptos >= evento.cap_max %}
+<p class="text-red-500 font-semibold mb-6">No quedan cupos ❌</p>
+
+{% else %}
+<a
+  href="{{ url_for('evento_inscribir', id=evento.id) }}"
+  class="px-5 py-2 bg-red-600 rounded font-bold hover:bg-red-700 transition"
+>
+  Inscribirme
+</a>
+{% endif %} {% else %}
+<p>
+  Debes
+  <a href="{{ url_for('login') }}" class="text-red-500 underline"
+    >iniciar sesión</a
+  >
+  para inscribirte.
+</p>
+{% endif %} {% endblock %}

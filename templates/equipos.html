@@ -1,18 +1,25 @@
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Equipos</title>
-    <!-- Link normal a Tailwind vía CDN -->
-    <!-- Tailwind Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!--<link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
-    />-->
-  </head>
-  <body>
-    <h1 class="text-3xl font-bold text-blue-500">Equipos</h1>
-  </body>
-</html>
+{% extends "base.html" %} {% block title %}Equipos{% endblock %} {% block
+content %}
+<h1 class="text-4xl font-bold mb-8 text-center">Equipos de la Liga Nacional</h1>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+  {% for equipo in equipos %}
+  <a
+    href="{{ url_for('equipo_detalle', id=equipo.id) }}"
+    class="flex items-center gap-4 bg-secundario rounded-xl p-4 shadow-lg hover:bg-gray-800 hover:scale-[1.02] transition cursor-pointer border border-gray-700"
+  >
+    <img
+      src="{{ url_for('static', filename=equipo.escudo if equipo.escudo else 'img/placeholder_equipo.png') }}"
+      class="w-16 h-16 object-contain"
+      alt="Escudo {{ equipo.nombre }}"
+    />
+
+    <div>
+      <h2 class="text-xl font-semibold">{{ equipo.nombre }}</h2>
+      <p class="text-gray-400 text-sm">{{ equipo.ciudad }}</p>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+
+{% endblock %}

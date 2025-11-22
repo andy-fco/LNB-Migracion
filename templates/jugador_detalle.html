@@ -1,0 +1,128 @@
+{% extends "base.html" %} {% block title %}{{ jugador.nombre }} {{
+jugador.apellido }}{% endblock %} {% block content %}
+
+<div class="max-w-6xl mx-auto mt-6">
+  <!-- HEADER DE JUGADOR -->
+  <div class="flex flex-col md:flex-row gap-8 items-start md:items-center">
+    <!-- FOTO CARNET -->
+    <img
+      src="{{ url_for('static', filename='img/jugadores/' ~ (jugador.foto_carnet or 'placeholder_carnet.jpg')) }}"
+      class="w-40 h-40 object-cover rounded-xl shadow-lg"
+    />
+
+    <!-- NOMBRE + INFO PRINCIPAL -->
+    <div class="flex-1">
+      <h1 class="text-4xl font-bold">
+        {{ jugador.nombre }} {{ jugador.apellido }}
+      </h1>
+
+      <!-- Media + Camiseta -->
+      <div class="flex items-center gap-4 mt-3">
+        <div class="text-5xl font-bold text-red-600">{{ jugador.media }}</div>
+
+        <div class="text-xl font-semibold flex items-center gap-2">
+          <span class="text-gray-400">#</span>
+          <span>{{ jugador.camiseta }}</span>
+        </div>
+      </div>
+
+      <!-- Datos básicos -->
+      <p class="text-gray-400 mt-2">
+        {{ jugador.posicion }} • {{ jugador.nacionalidad }}
+      </p>
+
+      {% if jugador.equipo_rel %}
+      <p class="mt-1">
+        Equipo:
+        <a
+          href="{{ url_for('equipo_detalle', id=jugador.equipo_rel.id) }}"
+          class="text-red-500 hover:underline"
+        >
+          {{ jugador.equipo_rel.nombre }}
+        </a>
+      </p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- SECCIÓN PRINCIPAL -->
+  <div class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-10">
+    <!-- STATS -->
+    <div class="lg:col-span-2">
+      <h2 class="text-2xl font-bold mb-4">Estadísticas</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% set stats = [ ('Tiro', jugador.tiro), ('Dribling', jugador.dribling),
+        ('Velocidad', jugador.velocidad), ('Pase', jugador.pase), ('Defensa',
+        jugador.defensa), ('Salto', jugador.salto) ] %} {% for nombre, valor in
+        stats %}
+        <div class="space-y-2 mb-4">
+          <div class="flex items-center justify-between">
+            <span class="text-lg font-semibold text-gray-200 tracking-wide">
+              {{ nombre }}
+            </span>
+            <span class="text-xl font-bold text-gray-100">{{ valor }}</span>
+          </div>
+
+          <!-- Barra -->
+          <div
+            class="w-full h-4 bg-gray-700/70 rounded-full overflow-hidden shadow-inner"
+          >
+            <div
+              class="h-full bg-red-600 rounded-full transition-all duration-300"
+              style="width: {{ valor }}%;"
+            ></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- FOTO GRANDE -->
+    <div>
+      <img
+        src="{{ url_for('static', filename='img/jugadores/' ~ (jugador.foto_juego or 'placeholder_full.jpg')) }}"
+        class="w-full rounded-xl shadow-lg object-cover h-[450px]"
+      />
+    </div>
+  </div>
+
+  <!-- DATOS EXTRAS -->
+  <div class="mt-12">
+    <h2 class="text-2xl font-bold mb-4">Información adicional</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="bg-secundario p-4 rounded-lg">
+        <p class="text-gray-400 text-sm">Fecha de nacimiento</p>
+        <p class="text-xl">{{ jugador.fecha_nacimiento }}</p>
+      </div>
+
+      <div class="bg-secundario p-4 rounded-lg">
+        <p class="text-gray-400 text-sm">Ciudad</p>
+        <p class="text-xl">{{ jugador.ciudad }}</p>
+      </div>
+
+      <div class="bg-secundario p-4 rounded-lg">
+        <p class="text-gray-400 text-sm">Altura</p>
+        <p class="text-xl">{{ jugador.altura }} m</p>
+      </div>
+
+      <div class="bg-secundario p-4 rounded-lg">
+        <p class="text-gray-400 text-sm">Mano hábil</p>
+        <p class="text-xl">{{ jugador.mano_habil }}</p>
+      </div>
+
+      <div class="bg-secundario p-4 rounded-lg">
+        <p class="text-gray-400 text-sm">Especialidad</p>
+        <p class="text-xl">{{ jugador.especialidad }}</p>
+      </div>
+
+      <div class="bg-secundario p-4 rounded-lg">
+        <p class="text-gray-400 text-sm">Jugada característica</p>
+        <p class="text-xl">{{ jugador.jugada }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
