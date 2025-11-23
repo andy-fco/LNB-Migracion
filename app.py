@@ -152,6 +152,107 @@ def juegos():
     return render_template("juegos.html")
 
 #MI JUGADOR
+
+@app.route("/mi_jugador/crear", methods=["GET", "POST"])
+@login_required
+def crear_mi_jugador():
+
+    
+    existente = Jugador.query.filter_by(aficionado_id=current_user.id).first()
+    if existente:
+        flash("Ya creaste tu jugador. Si querés modificarlo, debés eliminarlo y crearlo de nuevo.", "warning")
+        return redirect(url_for("mi_jugador"))
+
+    if request.method == "POST":
+
+        nombre = request.form["nombre"]
+        apellido = request.form["apellido"]
+        ciudad = request.form["ciudad"]
+        nacionalidad = request.form["nacionalidad"]
+        altura = float(request.form["altura"])
+        camiseta = int(request.form["camiseta"])
+        posicion = request.form["posicion"]
+        mano_habil = request.form["mano_habil"]
+        especialidad = request.form["especialidad"]
+        jugada = request.form["jugada"]
+
+        stats = {
+            "tiro": 65,
+            "pase": 65,
+            "dribling": 65,
+            "velocidad": 65,
+            "defensa": 65,
+            "salto": 65
+        }
+ 
+        bonus_esp = {
+            "Tiro": {"tiro": 3, "dribling": 1, "velocidad": 1},
+            "Asistencias": {"pase": 3, "dribling": 1, "velocidad": 1},
+            "Volcadas": {"salto": 3, "velocidad": 2},
+            "Tapas": {"defensa": 3, "salto": 2},
+            "Uno contra uno": {"dribling": 3, "velocidad": 2},
+            "Defensa": {"defensa": 3, "velocidad": 1, "salto": 1},
+            "Poste bajo": {"defensa": 2, "salto": 2},
+        }
+
+        if especialidad in bonus_esp:
+            for stat, inc in bonus_esp[especialidad].items():
+                stats[stat] += inc
+ 
+        bonus_jugada = {
+            "Alley-oop": {"pase": 1, "salto": 2},
+            "Volcada": {"salto": 2},
+            "Volcada en transición": {"velocidad": 2},
+            "Triple": {"tiro": 2},
+            "Salida de tirador": {"tiro": 2},
+            "Stepback": {"tiro": 2, "dribling": 1},
+            "Flotadora": {"tiro": 1, "dribling": 1},
+            "Gancho": {"tiro": 1, "defensa": 1},
+            "Cross-over": {"dribling": 2},
+            "Pick n roll": {"pase": 1, "velocidad": 1},
+            "Pick n pop": {"tiro": 2},
+            "No-look pass": {"pase": 2},
+        }
+
+        if jugada in bonus_jugada:
+            for stat, inc in bonus_jugada[jugada].items():
+                stats[stat] += inc
+ 
+        media = round(sum(stats.values()) / len(stats))
+ 
+        nuevo = Jugador(
+            nombre=nombre,
+            apellido=apellido,
+            ciudad=ciudad,
+            nacionalidad=nacionalidad,
+            altura=altura,
+            camiseta=camiseta,
+            posicion=posicion,
+            mano_habil=mano_habil,
+            especialidad=especialidad,
+            jugada=jugada,
+            tiro=stats["tiro"],
+            pase=stats["pase"],
+            dribling=stats["dribling"],
+            velocidad=stats["velocidad"],
+            defensa=stats["defensa"],
+            salto=stats["salto"],
+            media=media,
+            equipo_id=None,   
+            aficionado_id=current_user.id
+        )
+
+        db.session.add(nuevo)
+        db.session.commit()
+
+        flash("¡Jugador creado con éxito!", "success")
+        return redirect(url_for("mi_jugador"))
+
+     
+    return render_template("mi_jugador_crear.html")
+
+
+
 @app.route("/mi_jugador")
 @login_required
 def mi_jugador():

@@ -2,21 +2,18 @@
 jugador.apellido }}{% endblock %} {% block content %}
 
 <div class="max-w-6xl mx-auto mt-6">
-  <!-- HEADER DE JUGADOR -->
   <div class="flex flex-col md:flex-row gap-8 items-start md:items-center">
-    <!-- FOTO CARNET -->
+    <!-- foto 4x4 -->
     <img
       src="{{ url_for('static', filename='img/jugadores/' ~ (jugador.foto_carnet or 'placeholder_carnet.jpg')) }}"
       class="w-40 h-40 object-cover rounded-xl shadow-lg"
     />
 
-    <!-- NOMBRE + INFO PRINCIPAL -->
     <div class="flex-1">
       <h1 class="text-4xl font-bold">
         {{ jugador.nombre }} {{ jugador.apellido }}
       </h1>
 
-      <!-- Media + Camiseta -->
       <div class="flex items-center gap-4 mt-3">
         <div class="text-5xl font-bold text-red-600">{{ jugador.media }}</div>
 
@@ -26,7 +23,6 @@ jugador.apellido }}{% endblock %} {% block content %}
         </div>
       </div>
 
-      <!-- Datos básicos -->
       <p class="text-gray-400 mt-2">
         {{ jugador.posicion }} • {{ jugador.nacionalidad }}
       </p>
@@ -45,9 +41,8 @@ jugador.apellido }}{% endblock %} {% block content %}
     </div>
   </div>
 
-  <!-- SECCIÓN PRINCIPAL -->
   <div class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-10">
-    <!-- STATS -->
+    <!-- stats -->
     <div class="lg:col-span-2">
       <h2 class="text-2xl font-bold mb-4">Estadísticas</h2>
 
@@ -78,7 +73,7 @@ jugador.apellido }}{% endblock %} {% block content %}
       </div>
     </div>
 
-    <!-- FOTO GRANDE -->
+    <!-- fotogrande -->
     <div>
       <img
         src="{{ url_for('static', filename='img/jugadores/' ~ (jugador.foto_juego or 'placeholder_full.jpg')) }}"
@@ -87,7 +82,7 @@ jugador.apellido }}{% endblock %} {% block content %}
     </div>
   </div>
 
-  <!-- DATOS EXTRAS -->
+  <!-- datos -->
   <div class="mt-12">
     <h2 class="text-2xl font-bold mb-4">Información adicional</h2>
 
