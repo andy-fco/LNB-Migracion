@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% block content %}
+
+<h1 class="text-3xl font-bold mb-6 text-center">Elegir equipo favorito</h1>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+  {% for equipo in equipos %}
+  <a
+    href="{{ url_for('guardar_equipo', id=equipo.id) }}"
+    class="bg-secundario rounded-xl shadow hover:shadow-lg transition p-4 flex flex-col items-center hover:bg-gray-800 hover:scale-[1.02] transition shadow"
+  >
+    <img
+      src="{{ url_for('static', filename='img/equipos/' ~ (equipo.escudo or 'placeholder.png')) }}"
+      class="w-20 h-20 object-contain mb-3"
+    />
+
+    <h2 class="text-xl font-semibold">{{ equipo.nombre }}</h2>
+    <p class="text-sm text-gray-600">{{ equipo.ciudad }}</p>
+  </a>
+  {% endfor %}
+</div>
+
+{% endblock %}

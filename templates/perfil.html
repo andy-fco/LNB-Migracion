@@ -1,26 +1,230 @@
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Perfil</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
-    />
-  </head>
-  <body>
-    <h1>Perfil</h1>
+{% extends "base.html" %} {% block title %}Mi perfil{% endblock %} {% block
+content %}
 
-    <p>Nombre de usuario: {{ username }}</p>
-    <p>Email: {{ mail }}</p>
+<h1 class="text-3xl font-bold mb-8">Mi perfil</h1>
 
-    <a href="{{ url_for('logout') }}" class="btn btn-danger"> Cerrar sesión </a>
-  </body>
-</html>
+<div
+  class="bg-secundario border border-gray-700 rounded-xl p-8 shadow-lg grid grid-cols-1 md:grid-cols-3 gap-8 mb-12"
+>
+  <!-- Datos -->
+  <div class="md:col-span-2 space-y-2">
+    <h2 class="text-2xl font-bold">
+      {{ user.nombre or user.username }} {{ user.apellido or "" }}
+    </h2>
+    <p class="text-gray-400">{{ user.username }}</p>
+
+    <p class="mt-4"><span class="font-semibold">Mail:</span> {{ user.mail }}</p>
+
+    <p>
+      <span class="font-semibold">Fecha de nacimiento:</span>
+      {% if user.fecha_nacimiento %} {{
+      user.fecha_nacimiento.strftime('%d/%m/%Y') }} {% else %} — {% endif %}
+    </p>
+
+    <p>
+      <span class="font-semibold">Contraseña:</span>
+      ************
+    </p>
+  </div>
+
+  <!-- foto de perfil -->
+  <div class="flex flex-col items-center gap-3">
+    <!--<a
+      href="{{ url_for('perfil') }}"
+      class="self-end mb-2 px-4 py-1 rounded-full bg-acento text-black text-sm font-semibold hover:bg-red-700 transition"
+    >
+      Editar
+    </a>-->
+
+    <div
+      class="w-40 h-40 rounded-full overflow-hidden bg-gray-800 border border-gray-600"
+    >
+      <img
+        src="{{ url_for('static', filename=user.foto_perfil or 'img/placeholder_perfil.jpg') }}"
+        class="w-full h-full object-cover"
+      />
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+  <!-- Jugador favorito -->
+  <div class="lg:col-span-2 space-y-4">
+    <div class="flex items-center justify-between">
+      <h2 class="text-2xl font-bold">Jugador favorito</h2>
+
+      <a
+        href="{{ url_for('elegir_jugador') }}"
+        class="px-3 py-1 bg-acento text-black rounded-full text-sm font-semibold hover:bg-red-700 transition"
+      >
+        {% if jugador_fav %}Cambiar{% else %}Elegir{% endif %}
+      </a>
+    </div>
+
+    {% if jugador_fav %}
+    <a
+      href="{{ url_for('jugador_detalle', id=jugador_fav.id) }}"
+      class="flex flex-col md:flex-row bg-secundario border border-gray-700 rounded-xl shadow hover:bg-gray-800 transition overflow-hidden"
+    >
+      <div class="w-full md:w-48 h-40 bg-gray-800">
+        <img
+          src="{{ url_for('static', filename=jugador_fav.foto_carnet or 'img/placeholder_jugador.png') }}"
+          class="w-full h-full object-cover"
+        />
+      </div>
+
+      <div class="flex-1 p-4 space-y-1">
+        <h3 class="text-xl font-bold">
+          {{ jugador_fav.nombre }} {{ jugador_fav.apellido }}
+        </h3>
+        <p class="text-gray-300">{{ jugador_fav.posicion }}</p>
+
+        {% if jugador_fav.equipo_rel %}
+        <p class="text-gray-400">
+          <span class="font-semibold">Equipo:</span> {{
+          jugador_fav.equipo_rel.nombre }}
+        </p>
+        {% endif %}
+
+        <p class="text-gray-400">
+          <span class="font-semibold">Altura:</span> {{ jugador_fav.altura }} m
+        </p>
+        <p class="text-gray-400">
+          <span class="font-semibold">Especialidad:</span> {{
+          jugador_fav.especialidad }}
+        </p>
+      </div>
+    </a>
+    {% else %}
+    <p class="text-gray-400">Todavía no elegiste un jugador favorito.</p>
+    {% endif %}
+
+    <!-- Equipo favorito -->
+    <div class="mt-8 space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-bold">Equipo favorito</h2>
+
+        <a
+          href="{{ url_for('elegir_equipo') }}"
+          class="px-3 py-1 bg-acento text-black rounded-full text-sm font-semibold hover:bg-red-700 transition"
+        >
+          {% if equipo_fav %}Cambiar{% else %}Elegir{% endif %}
+        </a>
+      </div>
+
+      {% if equipo_fav %}
+      <a
+        href="{{ url_for('equipo_detalle', id=equipo_fav.id) }}"
+        class="flex flex-col md:flex-row bg-secundario border border-gray-700 rounded-xl shadow hover:bg-gray-800 transition overflow-hidden"
+      >
+        <div
+          class="w-full md:w-40 h-32 flex items-center justify-center bg-gray-800"
+        >
+          <img
+            src="{{ url_for('static', filename=equipo_fav.escudo or 'img/placeholder_equipo.png') }}"
+            class="max-h-24 object-contain"
+          />
+        </div>
+
+        <div class="flex-1 p-4 space-y-1">
+          <h3 class="text-xl font-bold">{{ equipo_fav.nombre }}</h3>
+          <p class="text-gray-300">{{ equipo_fav.ciudad }}</p>
+          <p class="text-gray-400">
+            <span class="font-semibold">Temporadas:</span> {{
+            equipo_fav.temporadas }}
+          </p>
+          <p class="text-gray-400">
+            <span class="font-semibold">Campeonatos:</span> {{
+            equipo_fav.campeonatos }}
+          </p>
+        </div>
+      </a>
+      {% else %}
+      <p class="text-gray-400">Todavía no elegiste un equipo favorito.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- eventos -->
+  <div
+    class="bg-secundario border border-gray-700 rounded-xl p-4 shadow flex flex-col max-h-96"
+  >
+    <h2 class="text-xl font-bold mb-3">Mis eventos</h2>
+
+    {% if eventos_inscripto %}
+    <div class="space-y-3 overflow-y-auto pr-1">
+      {% for ea in eventos_inscripto %} {% set ev = ea.evento %}
+      <a
+        href="{{ url_for('evento_detalle', id=ev.id) }}"
+        class="block bg-primario border border-gray-700 rounded-lg p-3 hover:bg-gray-800 transition"
+      >
+        <p class="font-semibold">{{ ev.titulo }}</p>
+        <p class="text-gray-400 text-sm">
+          {{ ev.fecha_y_hora.strftime('%d/%m/%Y %H:%M') }}
+        </p>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-400 text-sm">
+      Todavía no te inscribiste a ningún evento.
+    </p>
+    {% endif %}
+  </div>
+</div>
+
+<!-- quinteto -->
+<div class="bg-secundario p-6 rounded-xl shadow-md mb-8">
+  <h2 class="text-2xl font-bold mb-4">Mi quinteto ideal</h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+    {% for pos, jugador in quinteto.items() %}
+    <div
+      class="p-4 bg-primario rounded-lg shadow border border-gray-700 flex flex-col items-center"
+    >
+      <h3 class="text-xl font-semibold mb-3">{{ pos }}</h3>
+
+      {% if jugador %}
+
+      <a
+        href="{{ url_for('jugador_detalle', id=jugador.id) }}"
+        class="w-full bg-secundario border border-gray-700 rounded-xl p-4 flex flex-col items-center hover:bg-gray-800 hover:scale-[1.02] transition shadow"
+      >
+        <img
+          src="{{ url_for('static', filename=jugador.foto_carnet or 'img/placeholder_jugador.png') }}"
+          class="w-24 h-24 object-cover rounded-full mb-3"
+        />
+
+        <h4 class="text-lg font-semibold text-center">
+          {{ jugador.nombre }} {{ jugador.apellido }}
+        </h4>
+
+        <p class="text-gray-400 text-sm">{{ jugador.posicion }}</p>
+        <p class="text-red-400 font-bold text-sm mt-1">
+          Media: {{ jugador.media }}
+        </p>
+      </a>
+
+      <a
+        href="{{ url_for('editar_quinteto', posicion=pos) }}"
+        class="mt-3 text-red-400 hover:underline text-sm"
+      >
+        Cambiar
+      </a>
+
+      {% else %}
+
+      <p class="text-gray-500 mb-2">Sin seleccionar</p>
+      <a
+        href="{{ url_for('editar_quinteto', posicion=pos) }}"
+        class="text-red-400 hover:underline text-sm"
+      >
+        Elegir jugador
+      </a>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
