@@ -1,0 +1,23 @@
+# No subir claves privadas
+.env
+
+# No subir entornos virtuales
+venv/
+env/
+
+# Caché de Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Archivos temporales
+*.swp
+*.swo
+
+# Base de datos (si no querés subirla)
+instance/
+*.db
+*.sqlite
+
+# Configuraciones locales
+.DS_Store

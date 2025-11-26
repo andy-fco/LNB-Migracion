@@ -8,6 +8,17 @@ from flask_login import (
     logout_user, login_required, current_user
 )
 from datetime import datetime
+from summ_utills import resumir_texto
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+
+
 import requests
 
 from models import (
@@ -39,6 +50,22 @@ def normalizar_posicion(pos):
 
 
 app = Flask(__name__)
+
+from authlib.integrations.flask_client import OAuth
+
+oauth = OAuth(app)
+
+google = oauth.register(
+    name="google",
+    client_id=GOOGLE_CLIENT_ID,
+    client_secret=GOOGLE_CLIENT_SECRET,
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={
+        "scope": "openid email profile"
+    }
+)
+
+
 app.config["SECRET_KEY"] = "clave_secreta_123"
 
 
@@ -60,6 +87,48 @@ def load_user(user_id):
 
 
 #------------ RUTAS ---------------
+
+#google
+@app.route("/login/google")
+def login_google():
+    redirect_uri = url_for("auth_google_callback", _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@app.route("/auth/callback")
+def auth_google_callback():
+    token = google.authorize_access_token()
+
+    # Obtener userinfo desde Google
+    user_info = google.get("https://openidconnect.googleapis.com/v1/userinfo").json()
+
+    email = user_info["email"]
+    nombre = user_info.get("given_name", None)
+    apellido = user_info.get("family_name", None)
+    foto = user_info.get("picture", None)
+
+    # Buscar si ya existe el usuario
+    user = User.query.filter_by(mail=email).first()
+
+    if not user:
+        # Crear uno nuevo
+        user = User(
+            mail=email,
+            username=email,   # obligatorio y único
+            password="google_oauth_placeholder",
+            nombre=nombre,
+            apellido=apellido,
+            foto_perfil=foto,
+            role="admin"  # o "aficionado", elegí vos
+        )
+        db.session.add(user)
+        db.session.commit()
+
+    # Loguear normalmente
+    login_user(user)
+
+    return redirect(url_for("index"))
+
+
 
 #USER-----------------------------------
 
@@ -874,22 +943,35 @@ def admin_articulos_crear():
         return redirect(url_for("index"))
 
     if request.method == "POST":
-        a = Articulo(
-            titulo=request.form["titulo"],
-            descripcion=request.form["descripcion"],
-            fecha=datetime.now().date(),      
-            portada=request.form["portada"] or None,
-            foto_1=request.form["foto_1"] or None,
-            foto_2=request.form["foto_2"] or None,
-            foto_3=request.form["foto_3"] or None
+        titulo = request.form["titulo"]
+        descripcion = request.form["descripcion"]
+        portada = request.form["portada"] or None
+        foto_1 = request.form["foto_1"] or None
+        foto_2 = request.form["foto_2"] or None
+        foto_3 = request.form["foto_3"] or None
+
+        
+        resumen = resumir_texto(descripcion)
+
+        articulo = Articulo(
+            titulo=titulo,
+            descripcion=descripcion,
+            resumen=resumen,
+            fecha=datetime.utcnow().date(),
+            portada=portada,
+            foto_1=foto_1,
+            foto_2=foto_2,
+            foto_3=foto_3
         )
 
-        db.session.add(a)
+        db.session.add(articulo)
         db.session.commit()
-        flash("Artículo creado correctamente.", "success")
+
+        flash("Artículo creado con resumen automático.", "success")
         return redirect(url_for("admin_articulos"))
 
     return render_template("admin/articulos_form.html", articulo=None)
+
 
 #editar
 @app.route("/admin/articulos/<int:id>/editar", methods=["GET", "POST"])
@@ -908,11 +990,16 @@ def admin_articulos_editar(id):
         articulo.foto_2 = request.form["foto_2"] or None
         articulo.foto_3 = request.form["foto_3"] or None
 
+        
+        articulo.resumen = resumir_texto(articulo.descripcion)
+
         db.session.commit()
-        flash("Artículo actualizado.", "success")
+
+        flash("Artículo actualizado con nuevo resumen automático.", "success")
         return redirect(url_for("admin_articulos"))
 
     return render_template("admin/articulos_form.html", articulo=articulo)
+
 
 #eliminar
 @app.route("/admin/articulos/<int:id>/eliminar")

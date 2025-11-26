@@ -127,7 +127,8 @@ class Articulo(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     titulo = db.Column(db.String(150), unique=True)
-    descripcion = db.Column(db.String(3000))
+    descripcion = db.Column(db.String(5000))
+    resumen = db.Column(db.String(500))
     fecha = db.Column(db.Date)
 
     portada = db.Column(db.String(300))
